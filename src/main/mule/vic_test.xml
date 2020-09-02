@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	
+	<flow name="vic_testFlow" doc:id="5bd44f9b-e6ca-4ad3-a23c-c0388330d7ed" >
+		<http:listener doc:name="Listener" doc:id="29830d93-cdde-4c52-9bed-7ab91a578897" config-ref="HTTP_Listener_config" path="/vic_test/" outputMimeType="application/json" allowedMethods="POST"/>
+		<logger level="INFO" doc:name="Logger" doc:id="fd05d033-ee7c-4087-a363-903a06d695ec" message="#[payload]]"/>
+		<ee:transform doc:name="Transform Message" doc:id="f24e5bb3-b1de-4b0a-bf2e-1d76f8e16f49" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+
+var HEADER = payload.Header
+var ITEMS = payload.Items
+
+output application/json
+---
+{
+	(HEADER map '$':ITEMS[$$])
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="111d31bf-57d6-469b-b58d-8046e83c48c4" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="6a81a816-6b50-4047-8a19-258aa9b750ce" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+import java!utils::ChangeTime
+
+var fName = payload.name
+var lName = payload.lastName
+var dt = payload.dateTime
+
+output application/json
+---
+{
+	firstName: fName,
+	lastName: lName,
+	fullName: fName ++ " " ++ lName,
+	dateTime: ChangeTime::new(dt).dateTime_,
+	city: payload.city,
+	country: payload.country,
+	location: payload.city ++ " " ++ payload.country
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-variable value="#[payload]" doc:name="intialPayloadVar" doc:id="b3275bc0-dbbc-458a-8b3d-5335c1ad8c8b" variableName="intialPayloadVar"/>
+		<flow-ref doc:name="flowRef1" doc:id="f32d2ded-59e2-4c05-be9b-5ec67417b2a3" name="vic_testSub_Flow"/>
+		<logger level="INFO" doc:name="Logger" doc:id="60169f15-0e13-4abd-b7d5-31aa6ed35467" message="#[vars.tempVar]"/>
+		<ee:transform doc:name="Transform Message" doc:id="f1181515-bdd7-47fa-ba67-cc65afda1bf2" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+var INITIAL_PAYLOAD = vars.intialPayloadVar
+var TEMP= vars.tempVar
+
+output application/json
+---
+{
+	//"output" : write(INITIAL_PAYLOAD, "application/json"),
+	//"temperatureCelcius": TEMP 
+	"firstName": INITIAL_PAYLOAD.firstName,
+	"lastName": INITIAL_PAYLOAD.lastName,
+	"fullName":INITIAL_PAYLOAD.fullName,
+	"dateTime":INITIAL_PAYLOAD.dateTime,
+	"city":INITIAL_PAYLOAD.city,
+	"location":INITIAL_PAYLOAD.location,
+	"temperatureCelcius":TEMP	
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="b7c9b2d0-c7cf-458a-b1e2-4e33e915d877" message="#[payload]"/>
+	</flow>
+	<sub-flow name="vic_testSub_Flow" doc:id="52d537ff-4eea-4a0b-be97-e42d1aad61eb" >
+		<logger level="INFO" doc:name="Logger" doc:id="9b18070b-3793-4a62-b6a7-869b9888f5e9" message="#[payload]"/>
+		<http:request method="GET" doc:name="Request" doc:id="a1b4e7bc-a9c3-435f-8a20-741341fc14fd" config-ref="HTTP_Request_configuration" url="https://samples.openweathermap.org/data/2.5/weather" outputMimeType="application/json">
+			<http:query-params ><![CDATA[#[{
+	"q" : payload.location,
+	"appid" : "439d4b804bc8187953eb36d2a8c26a02"
+}]]]></http:query-params>
+		</http:request>
+		<logger level="INFO" doc:name="Logger" doc:id="349f892c-078c-4c8d-b588-fd9da115cfa2" message="#[payload]"/>
+		<set-variable value="#[payload]" doc:name="weatherPayloadVar" doc:id="50ff2ec8-8cf5-4bf4-8477-60ec306b17c9" variableName="weatherPayloadVar" />
+		<ee:transform doc:name="Transform Message" doc:id="f59edefb-f341-43d1-9291-cd9a90343df1" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+
+import java!utils::TempCelius
+
+var temp = payload.main.temp
+
+output application/java
+---
+{
+	temp_celius : TempCelius::new(temp).tempCelius
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="1edf3014-2273-4bc3-83cf-c99cf3fe40ca" message="#[payload]"/>
+		<set-variable value="#[payload.temp_celius]" doc:name="tempVar" doc:id="365a4224-8a2c-410c-bf1d-ba62cea179ff" variableName="tempVar"/>
+	</sub-flow>
+</mule>

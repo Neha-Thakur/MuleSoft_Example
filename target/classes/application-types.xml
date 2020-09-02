@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="i1" format="json">
+      <types:shape format="weave" example="examples/test_input-5.json"><![CDATA[%dw 2.0
+
+type i1 = {|
+  name: String, 
+  lastname: String, 
+  ssn: String
+|} {"example": "{\\\"name\\\":\\\"John\\\",\\\"lastname\\\":\\\"smith\\\",\\\"ssn\\\":\\\"548-1234-877\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="i2" format="json">
+      <types:shape format="weave" example="examples/test_output-3.json"><![CDATA[%dw 2.0
+
+type i2 = {|
+  fullname: String, 
+  ssn: String
+|} {"example": "{\\\"fullname\\\":\\\"John smith\\\",\\\"ssn\\\":\\\"548-1234-877\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="i3" format="json">
+      <types:shape format="weave" example="examples/input_json-3.json"><![CDATA[%dw 2.0
+
+type i3 = {|
+  Header: Array<String>, 
+  Items: Array<String>
+|} {"example": "{\\\"Header\\\":[\\\"name\\\",\\\"lastName\\\",\\\"dateTime\\\",\\\"city\\\",\\\"country\\\"],\\\"Items\\\":[\\\"John\\\",\\\"Smith\\\",\\\"31012019T1900Z\\\",\\\"Melbourne\\\",\\\"Australia\\\"]}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="i4" format="json">
+      <types:shape format="weave" example="examples/output_json-1.json"><![CDATA[%dw 2.0
+
+type i4 = {|
+  lastname: String, 
+  name: String, 
+  timeZone: String, 
+  offSet: String, 
+  fullName: String, 
+  temperatureCelcius: Number {"typeId": "int"}, 
+  dateTime: String, 
+  city: String, 
+  location: String
+|} {"example": "{\\\"lastname\\\":\\\"\\\",\\\"name\\\":\\\"\\\",\\\"timeZone\\\":\\\"\\\",\\\"offSet\\\":\\\"\\\",\\\"fullName\\\":\\\"\\\",\\\"temperatureCelcius\\\":0,\\\"dateTime\\\":\\\"\\\",\\\"city\\\":\\\"\\\",\\\"location\\\":\\\"\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="c1" format="java">
+      <types:shape format="java" element="victoriatest.TransformVicTest"/>
+    </types:type>
+    <types:type name="i21" format="json">
+      <types:shape format="weave" example="examples/input_json2.json"><![CDATA[%dw 2.0
+
+type i21 = {|
+  name: String, 
+  lastName: String, 
+  dateTime: String, 
+  city: String, 
+  country: String
+|} {"example": "{\\\"name\\\":\\\"John\\\",\\\"lastName\\\":\\\"Smith\\\",\\\"dateTime\\\":\\\"31-01-2019T19:0:0Z\\\",\\\"city\\\":\\\"Melbourne\\\",\\\"country\\\":\\\"Australia\\\"}"}
+
+]]></types:shape>
+    </types:type>
+    <types:type name="i22" format="json">
+      <types:shape format="weave" example="examples/input_json3.json"><![CDATA[%dw 2.0
+
+type i22 = {|
+  coord: {|
+    lon: Number {"typeId": "double"}, 
+    lat: Number {"typeId": "double"}
+  |}, 
+  weather: Array<{|    id: Number {"typeId": "int"},     main: String,     description: String,     icon: String  |}>, 
+  base: String, 
+  main: {|
+    temp: Number {"typeId": "double"}, 
+    pressure: Number {"typeId": "int"}, 
+    humidity: Number {"typeId": "int"}, 
+    temp_min: Number {"typeId": "double"}, 
+    temp_max: Number {"typeId": "double"}
+  |}, 
+  visibility: Number {"typeId": "int"}, 
+  wind: {|
+    speed: Number {"typeId": "double"}, 
+    deg: Number {"typeId": "int"}
+  |}, 
+  clouds: {| all: Number {"typeId": "int"} |}, 
+  dt: Number {"typeId": "int"}, 
+  sys: {|
+    "type": Number {"typeId": "int"}, 
+    id: Number {"typeId": "int"}, 
+    message: Number {"typeId": "double"}, 
+    country: String, 
+    sunrise: Number {"typeId": "int"}, 
+    sunset: Number {"typeId": "int"}
+  |}, 
+  id: Number {"typeId": "int"}, 
+  name: String, 
+  cod: Number {"typeId": "int"}
+|} {"example": "{\\\"coord\\\":{\\\"lon\\\":-0.13,\\\"lat\\\":51.51},\\\"weather\\\":[{\\\"id\\\":300,\\\"main\\\":\\\"Drizzle\\\",\\\"description\\\":\\\"light intensity drizzle\\\",\\\"icon\\\":\\\"09d\\\"}],\\\"base\\\":\\\"stations\\\",\\\"main\\\":{\\\"temp\\\":280.32,\\\"pressure\\\":1012,\\\"humidity\\\":81,\\\"temp_min\\\":279.15,\\\"temp_max\\\":281.15},\\\"visibility\\\":10000,\\\"wind\\\":{\\\"speed\\\":4.1,\\\"deg\\\":80},\\\"clouds\\\":{\\\"all\\\":90},\\\"dt\\\":1485789600,\\\"sys\\\":{\\\"type\\\":1,\\\"id\\\":5091,\\\"message\\\":0.0103,\\\"country\\\":\\\"GB\\\",\\\"sunrise\\\":1485762037,\\\"sunset\\\":1485794875},\\\"id\\\":2643743,\\\"name\\\":\\\"London\\\",\\\"cod\\\":200}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#a64ef6de-d82d-42ad-9ffc-3fc6e25b6a1b">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="i1"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="i2"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f24e5bb3-b1de-4b0a-bf2e-1d76f8e16f49">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="i3"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#362e5a95-633e-4cdc-9567-2063a52d04c8">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="i1"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#6a81a816-6b50-4047-8a19-258aa9b750ce">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="i21"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f59edefb-f341-43d1-9291-cd9a90343df1">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="i22"/>
+        </types:message>
+      </types:input-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

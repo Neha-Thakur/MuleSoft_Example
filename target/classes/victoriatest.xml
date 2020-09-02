@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="7304170b-7a7a-46b1-9e0a-2ad0c5495d1f" >
+		<http:request-connection host="localhost" port="8081" />
+	</http:request-config>
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="23e61755-01ce-46e0-a49d-4d7835a61e91" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="victoriatestFlow" doc:id="9e996ee1-252a-44c9-b6f6-47ca86b18787" >
+		<http:listener doc:name="Listener" doc:id="7860aee2-e9b2-431c-b63e-a9704ac6417e" config-ref="HTTP_Listener_config" path="/" allowedMethods="POST" outputMimeType="application/json">
+		</http:listener>
+		<logger level="INFO" doc:name="Logger" doc:id="df8407e2-bd74-4303-814f-35105652aded" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="a64ef6de-d82d-42ad-9ffc-3fc6e25b6a1b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	fullname: (payload.name ++ "" ++ payload.lastname),
+	ssn: payload.ssn
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="6dfa6ffa-4bf9-4be6-832e-27b9e1313da2" message="#[payload]"/>
+	</flow>
+</mule>

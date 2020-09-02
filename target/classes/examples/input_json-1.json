@@ -1,0 +1,16 @@
+{
+"Header" : [
+"name",
+"lastName",
+"dateTime",
+"city",
+"country"
+],
+"Items" : [
+"John",
+"Smith",
+"31012019T1900Z", //ddMMyyyyTHHmmX
+"Australia",
+"Melbourne"
+]
+}
